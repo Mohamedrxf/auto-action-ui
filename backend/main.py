@@ -192,3 +192,27 @@ async def sync_flush():
     await flush_sync_queue()
     status = await db.get_sync_status()
     return {"message": "Sync flush triggered", "status": status}
+
+class CreateTaskRequest(BaseModel):
+    workflow_id: str
+    title:       str
+    description: str = ""
+    owner:       str = ""
+    priority:    str = "medium"
+    due_date:    str = None
+    metadata:    dict = {}
+
+
+@app.post("/tasks")
+async def create_task(req: CreateTaskRequest):
+    task = await db.create_task(
+        workflow_id=req.workflow_id,
+        title=req.title,
+        description=req.description,
+        owner=req.owner,
+        priority=req.priority,
+        due_date=req.due_date,
+        metadata=req.metadata,
+    )
+    return task
+
